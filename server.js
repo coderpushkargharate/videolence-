@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connections
-mongoose.connect(process.env.MONGO_URI_MAIN)
+mongoose.connect(process.env.MONGO_URI_MAIN, { ssl: true, sslValidate: false })
   .then(() => console.log("Connected to dashboardDB"))
   .catch((err) => console.error("Error connecting to dashboardDB:", err));
 
