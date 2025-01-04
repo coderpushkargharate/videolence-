@@ -16,13 +16,9 @@ app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connections
-const mongoose = require('mongoose');
-
-const uri = "mongodb+srv://<username>:<password>@videolens.tvvl1.mongodb.net/dashboardDB?retryWrites=true&w=majority";
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to dashboardDB'))
-  .catch(err => console.error('Error connecting to dashboardDB:', err));
-
+mongoose.connect(process.env.MONGO_URI_MAIN)
+  .then(() => console.log("Connected to dashboardDB"))
+  .catch((err) => console.error("Error connecting to dashboardDB:", err));
 
 const secondDbConnection = mongoose.createConnection(process.env.MONGO_URI_SECOND);
 secondDbConnection.on("connected", () => console.log("Connected to vediolence"));
@@ -35,6 +31,7 @@ const linkSchema = new mongoose.Schema({
   price: { type: Number, default: 0 },
   component: { type: String, required: true },
 });
+
 const Home = mongoose.model("Home", linkSchema);
 const Wedding = mongoose.model("Wedding", linkSchema);
 const Birthday = mongoose.model("Birthday", linkSchema);
@@ -49,6 +46,7 @@ const babyShowerSchema = new mongoose.Schema({
   message: String,
   photos: [String],
 });
+
 const birthdaySchema = new mongoose.Schema({
   name: String,
   time: String,
@@ -58,12 +56,14 @@ const birthdaySchema = new mongoose.Schema({
   message: String,
   photos: [String],
 });
+
 const contactSchema = new mongoose.Schema({
   name: String,
   email: String,
   subject: String,
   comment: String,
 });
+
 const weddingSchema = new mongoose.Schema({
   brideName: String,
   brideParentsName: String,
@@ -80,12 +80,13 @@ const weddingSchema = new mongoose.Schema({
   groomPhotos: String,
 });
 
+// Define models using secondDbConnection
 const FormData = secondDbConnection.model("BabyShower", babyShowerSchema);
 const BirthdayData = secondDbConnection.model("Birthday", birthdaySchema);
 const ContactFormData = secondDbConnection.model("Contact", contactSchema);
 const WeddingData = secondDbConnection.model("Wedding", weddingSchema);
 
-// Multer setup
+// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -94,9 +95,10 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
+
 const upload = multer({ storage });
 
-// Utility function
+// Utility function to get model by component
 const getModelByComponent = (component) => {
   switch (component) {
     case "home":
@@ -168,7 +170,7 @@ app.delete("/api/links/:category/:id", async (req, res) => {
   }
 });
 
-// Routes for vediolence
+// Routes for vediolence database
 app.post("/submit-form", upload.array("photos", 3), async (req, res) => {
   try {
     const { name, time, age, venue, date, message } = req.body;
