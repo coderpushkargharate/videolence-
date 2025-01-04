@@ -24,7 +24,7 @@ const secondDbConnection = mongoose.createConnection(process.env.MONGO_URI_SECON
 secondDbConnection.on("connected", () => console.log("Connected to vediolence"));
 secondDbConnection.on("error", (err) => console.error("Error connecting to vediolence:", err));
 
-// Define schema for `dashboardDB`
+// Define schemas and models
 const linkSchema = new mongoose.Schema({
   url: { type: String, required: true },
   type: { type: String, default: "regular" },
@@ -36,7 +36,6 @@ const Wedding = mongoose.model("Wedding", linkSchema);
 const Birthday = mongoose.model("Birthday", linkSchema);
 const BabyShower = mongoose.model("BabyShower", linkSchema);
 
-// Define schemas for `vediolence`
 const babyShowerSchema = new mongoose.Schema({
   name: String,
   time: String,
@@ -109,7 +108,7 @@ const getModelByComponent = (component) => {
   }
 };
 
-// Routes for `dashboardDB`
+// Routes for dashboardDB
 app.get("/api/links/:category", async (req, res) => {
   try {
     const { category } = req.params;
@@ -165,7 +164,7 @@ app.delete("/api/links/:category/:id", async (req, res) => {
   }
 });
 
-// Routes for `vediolence`
+// Routes for vediolence
 app.post("/submit-form", upload.array("photos", 3), async (req, res) => {
   try {
     const { name, time, age, venue, date, message } = req.body;
