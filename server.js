@@ -16,9 +16,13 @@ app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB Connections
-mongoose.connect(process.env.MONGO_URI_MAIN)
-  .then(() => console.log("Connected to dashboardDB"))
-  .catch((err) => console.error("Error connecting to dashboardDB:", err));
+const mongoose = require('mongoose');
+
+const uri = "mongodb+srv://<username>:<password>@videolens.tvvl1.mongodb.net/dashboardDB?retryWrites=true&w=majority";
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to dashboardDB'))
+  .catch(err => console.error('Error connecting to dashboardDB:', err));
+
 
 const secondDbConnection = mongoose.createConnection(process.env.MONGO_URI_SECOND);
 secondDbConnection.on("connected", () => console.log("Connected to vediolence"));
